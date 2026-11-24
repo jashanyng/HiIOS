@@ -1,0 +1,14 @@
+Pod::Spec.new do |spec|
+  spec.name = 'HiIOSNavRxSwift'
+  spec.version = '4.0.0-alpha.1'
+  spec.summary = 'HiIOSNavRxSwift module of the reusable HiIOS library.'
+  spec.homepage = 'https://github.com/pcfprio/HiIOS'
+  spec.license = { :type => 'MIT', :file => 'LICENSE' }
+  spec.author = { 'YangJianxiang' => 'pcfprio@gmail.com' }
+  spec.source = { :git => 'https://github.com/pcfprio/HiIOS.git', :tag => spec.version.to_s }
+  spec.ios.deployment_target = '17.0'
+  spec.swift_version = '6.0'
+  spec.source_files = 'Sources/HiIOSNavRxSwift/**/*.swift'
+  spec.dependency 'HiIOSNavCore', '4.0.0-alpha.1'
+  spec.dependency 'RxSwift', '6.9.0'
+end
