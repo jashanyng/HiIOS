@@ -21,7 +21,7 @@ GitHub Trending 的独立限制见 [`docs/engineering/gh-trending.md`](docs/engi
 
 ### Issue tracker
 
-本仓库的 Issue 与规格说明使用 GitHub Issues（`pcfprio/HiIOS`，通过 `gh` CLI 操作）。详见 [`docs/agents/issue-tracker.md`](docs/agents/issue-tracker.md)。
+本仓库的 Issue 与规格说明使用 GitHub Issues（`jashanyng/HiIOS`，通过 `gh` CLI 操作）。详见 [`docs/agents/issue-tracker.md`](docs/agents/issue-tracker.md)。
 
 ### Triage labels
 

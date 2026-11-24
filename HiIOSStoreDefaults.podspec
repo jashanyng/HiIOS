@@ -2,10 +2,10 @@ Pod::Spec.new do |spec|
   spec.name = 'HiIOSStoreDefaults'
   spec.version = '4.0.0-alpha.1'
   spec.summary = 'HiIOSStoreDefaults module of the reusable HiIOS library.'
-  spec.homepage = 'https://github.com/pcfprio/HiIOS'
+  spec.homepage = 'https://github.com/jashanyng/HiIOS'
   spec.license = { :type => 'MIT', :file => 'LICENSE' }
-  spec.author = { 'YangJianxiang' => 'pcfprio@gmail.com' }
-  spec.source = { :git => 'https://github.com/pcfprio/HiIOS.git', :tag => spec.version.to_s }
+  spec.author = { 'Jashan Yang' => 'jashanyng@gmail.com' }
+  spec.source = { :git => 'https://github.com/jashanyng/HiIOS.git', :tag => spec.version.to_s }
   spec.ios.deployment_target = '17.0'
   spec.swift_version = '6.0'
   spec.source_files = 'Sources/HiIOSStoreDefaults/**/*.swift'

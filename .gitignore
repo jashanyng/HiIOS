@@ -1,6 +1,3 @@
-Examples/*/Pods/
-Examples/*/Podfile.lock
-Examples/*/*.xcworkspace
 .build/
 .swiftpm/
 Pods/
@@ -13,15 +10,20 @@ xcuserdata/
 *.dSYM
 *.dSYM.zip
 *.ipa
+*.xcarchive
+*.xcresult
 *.xcworkspace
+*.p8
 Podfile.lock
 
 # macOS, local agent/IDE & environment artifacts
 .DS_Store
 ._*
 /.codegraph/
-/.claude/worktrees/
-/.claude/settings.local.json
+/.claude/
+/.codex/
+/.gemini/
+/.scratch/
 .vscode/
 **/.env
 **/.env.*
