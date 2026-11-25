@@ -1,9 +1,10 @@
 # HiIOS 文档索引
 
-- [`architecture/products.md`](architecture/products.md)：产品家族、模块依赖与双分发边界。
+- [`architecture/products.md`](architecture/products.md)：产品家族、模块依赖与纯 SwiftPM 单分发边界。
+- [`adr/0001-swiftpm-only-distribution.md`](adr/0001-swiftpm-only-distribution.md)：HiIOS 效率库采用纯 SwiftPM 单分发的架构决策记录。
 - [`engineering/sibling-source-dependency.md`](engineering/sibling-source-dependency.md)：任何消费项目采用同级源码检出时的版本锁与 Git 硬门禁。
-- [`engineering/gh-trending.md`](engineering/gh-trending.md)：独立 GitHub Trending 产品的解析、网络、测试与合规限制。
-- [`engineering/dependencies.md`](engineering/dependencies.md)：双分发依赖准入、第三方库归属与旧库参考边界。
+- [`engineering/gh-trending.md`](engineering/gh-trending.md)：独立可选 GitHub Trending 产品的解析、网络、测试与合规限制。
+- [`engineering/dependencies.md`](engineering/dependencies.md)：SwiftPM 依赖准入、第三方库归属与旧库参考边界。
 - [`agents/issue-tracker.md`](agents/issue-tracker.md)：GitHub Issues 追踪器与 `gh` 操作约定。
 - [`agents/triage-labels.md`](agents/triage-labels.md)：Triage 标准角色与仓库标签映射。
 - [`agents/domain.md`](agents/domain.md)：领域术语表（`GLOSSARY.md`）与架构决策记录（`docs/adr/`）读取约定。

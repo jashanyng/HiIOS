@@ -16,7 +16,7 @@ public enum HiIOSResourceError: ClassifiedFailure, Equatable {
     }
 }
 
-/// 调用方明确提供资源 Bundle，适用于 SPM 的 Bundle.module 和 CocoaPods 资源包。
+/// 调用方明确提供资源 Bundle（如 SwiftPM target 的 Bundle.module 或宿主显式传入的 Bundle）。
 public struct HiIOSResourceReader {
     private let bundle: Bundle
 

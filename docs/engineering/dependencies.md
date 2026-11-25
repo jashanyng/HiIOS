@@ -1,18 +1,18 @@
 # HiIOS 依赖准入与历史参考
 
-HiIOS 同时通过 SwiftPM 与 CocoaPods 分发；新增或升级直接依赖时，核对两个渠道均可安装的同一稳定版本、许可证、维护状态、平台支持、并发安全、隐私数据流、传递依赖、二进制与启动成本。`Package.swift` 与对应 podspec 的版本须一致，不能靠某个消费 App 的 `Package.resolved` 或 `Podfile.lock` 掩盖分发差异。构建插件和宏须先审查来源与权限，不用跳过验证参数绕过审查。
+HiIOS 效率库仅通过 **SwiftPM** 单渠道分发；新增或升级直接依赖时，核对可验证的稳定 SwiftPM 版本源、许可证、维护状态、平台支持、并发安全、隐私数据流、传递依赖、二进制与启动成本。所有直接第三方依赖须在根 [`Package.swift`](../../Package.swift) 中锁定精确稳定版本（`exact:`），并与仓库内的 [`Package.resolved`](../../Package.resolved) 同步提交，不能依赖未锁定版本区间或靠消费项目的本地解析状态掩盖版本漂移。首次启用 Swift Package Plugin 或 Swift Macro 前必须人工审查来源与权限，严禁使用 `-skipPackagePluginValidation` 或 `-skipMacroValidation` 等跳过参数绕过信任与安全校验。
 
 | 依赖 | 本库当前归属 |
 | --- | --- |
 | Alamofire | Moya 的底层依赖；类型不穿透 HiIOS 自有接口 |
 | Moya | `HiIOSNetCore` 的默认 transport；RxSwift 与 Combine adapter 独立 |
 | DeviceKit | 仅用于 `HiIOSCore` 的设备描述，不把设备型号当身份 |
-| SwifterSwift | 当前 SPM 只提供整体 product，故仅在 Core 使用；Base 保持纯净 |
+| SwifterSwift | 当前 SwiftPM 只提供整体 product，故仅在 Core 使用；Base 保持纯净 |
 | SwiftyBeaver | 仅在可选 `HiIOSSuiteLogSwiftyBeaver` adapter 使用 |
 | SFSafeSymbols | 仅由 `HiIOS` 便捷入口聚合 |
 | SwiftSoup | 仅用于 `HiIOSGHTrending` 的 HTML parser |
-| URLNavigator | 按 MIT 协议内置源码于 `HiIOSNavRxSwift` 内部，不再作为外部 SPM/Pod 依赖 |
-| FCUUID | 缺少可核对的同版双分发，不进入本库 |
+| URLNavigator | 按 MIT 协议内置源码于 `HiIOSNavRxSwift` 内部，不再作为外部 SwiftPM 依赖 |
+| FCUUID | 缺少稳定可验证的 SwiftPM 源，不进入本库 |
 
 这些是当前产品选择，采用或升级前仍需核对实际分发源和当前平台支持。不为未来可能的 adapter 预装依赖，不把第三方公共类型固化进通用契约。
 

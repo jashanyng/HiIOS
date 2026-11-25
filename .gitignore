@@ -1,6 +1,5 @@
 .build/
 .swiftpm/
-Pods/
 DerivedData/
 xcuserdata/
 *.xcuserstate
@@ -14,7 +13,6 @@ xcuserdata/
 *.xcresult
 *.xcworkspace
 *.p8
-Podfile.lock
 
 # macOS, local agent/IDE & environment artifacts
 .DS_Store

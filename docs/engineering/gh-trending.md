@@ -1,8 +1,8 @@
 # HiIOSGHTrending 独立产品
 
-`HiIOSGHTrending` 的 SPM product、target、Swift module 与独立 Pod 同名，聚合 Pod 的显式入口为 `HiIOS/GHTrending`。它跟随 HiIOS 统一版本，但不进入 Suite、默认聚合入口或其他项目的基础依赖。
+`HiIOSGHTrending` 作为独立可选的 SwiftPM product、target 与 Swift module 随仓库统一版本演进，不进入 `HiIOSSuite`、`HiIOS` 默认便捷入口或其他项目的基础依赖。
 
-- 公开 API 只暴露自有值、查询条件、错误、parser 与可注入 client；SwiftSoup 类型不穿透边界。SwiftSoup 的 SPM/CocoaPods 版本和行为保持一致。
+- 公开 API 只暴露自有值、查询条件、错误、parser 与可注入 client；`SwiftSoup` 类型不穿透边界，且 `SwiftSoup` 在根 [`Package.swift`](../../Package.swift) 中以精确版本（`exact:`）锁定并与 [`Package.resolved`](../../Package.resolved) 同步。
 - GitHub 没有公开 Trending API；`/trending` 是未版本化 HTML 页面。GitHub Search API 结果须称为 Popular Repositories。
 - 库本身不自动发起线上抓取：是否在生产装配 live client 由消费项目在其 Composition Root 决定并记录（AtlasHub_iOS 自 2026-11-11 起装配，见其 ADR-0010）。库交付模型、parser、去标识 fixture 与注入式 client 契约。
 - 不使用代理绕过、登录 Cookie/token 抓取、高频轮询、批量预取或限流绕过；不记录完整 HTML 或个人信息。

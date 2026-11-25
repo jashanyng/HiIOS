@@ -1,44 +1,78 @@
 # HiIOS
 
-HiIOS is a reusable iOS development library. It ships the same Swift modules through Swift Package Manager and CocoaPods so applications can select contracts and adapters separately. The current `dev` branch is the unreleased 4.x development line; the published 3.0.0 release remains unchanged.
+HiIOS 效率库是独立于具体业务的 iOS 基础能力库，仅通过 **Swift Package Manager（SwiftPM）** 单一渠道分发，以根 [`Package.swift`](Package.swift) 为唯一事实源。当前仓库处于**制作期**，版本基线定为 `0.0.1`，制作期日常源码提交不预先创建 Git 标签。
 
-| Family | Modules | Purpose |
+## 产品家族与模块
+
+| 家族 | 公开产品模块 | 核心职责 |
 | --- | --- | --- |
-| Base | `HiIOSBase` | Platform independent models, failures, logging, analytics and social sharing contracts |
-| Core | `HiIOSCore` | Common iOS colors, fonts, resources and device utilities |
-| Net | `HiIOSNetCore`, `HiIOSNetRxSwift`, `HiIOSNetCombine` | HTTP contract, Moya transport and optional reactive adapters |
-| Nav | `HiIOSNavCore`, `HiIOSNavRxSwift`, `HiIOSNavCombine` | Typed routes, validation and optional reactive adapters |
-| Store | `HiIOSStoreCore`, `HiIOSStoreKeychain`, `HiIOSStoreDefaults`, `HiIOSStoreFile` | Storage contract and replaceable adapters |
-| Suite | `HiIOSSuiteCore`, `HiIOSSuiteLogOSLog`, `HiIOSSuiteLogSwiftyBeaver` | Shared UI components and optional log sinks |
+| Base | `HiIOSBase` | 纯 Swift 模型、领域错误、日志、统计与社会化分享（`socialsharing`）契约 |
+| Core | `HiIOSCore` | 通用语义颜色、字体、资源读取、序列化、文件与设备描述工具 |
+| Net | `HiIOSNetCore`、`HiIOSNetRxSwift`、`HiIOSNetCombine`（聚合别名 `HiIOSNet`） | HTTP 传输契约、Moya transport 与可选响应式适配器 |
+| Nav | `HiIOSNavCore`、`HiIOSNavRxSwift`、`HiIOSNavCombine`（聚合别名 `HiIOSNav`） | 强类型路由、`URLRouter` 安全校验、路由栈与展示状态 |
+| Store | `HiIOSStoreCore`、`HiIOSStoreKeychain`、`HiIOSStoreDefaults`、`HiIOSStoreFile`（聚合组合 `HiIOSStore`） | 字节存储、Keychain 安全值契约与可替换适配器 |
+| Suite | `HiIOSSuiteCore`、`HiIOSSuiteLogOSLog`、`HiIOSSuiteLogSwiftyBeaver`（聚合别名 `HiIOSSuite`） | 无业务语义的通用 SwiftUI 页面外观组件与可选日志输出通道 |
+| 按需扩展 | `HiIOSGHTrending` | 独立可选的 GitHub Trending 解析与注入式客户端模块 |
+| 便捷入口 | `HiIOS` | 组合 `HiIOSCore`、`HiIOSNetCombine`、`HiIOSNavCombine`、`HiIOSStore*`、`HiIOSSuiteCore` 与 `SFSafeSymbols` |
 
-`HiIOSGHTrending` is an independent optional GitHub Trending module. The `HiIOS` convenience product combines Core, NetCombine, NavCombine, Store and SuiteCore, plus SFSafeSymbols. It does not build or link the RxSwift adapters or vendor SDKs by default; SwiftPM may still resolve package-wide dependencies declared for other optional products. Source files import their chosen modules explicitly.
+便捷入口 `HiIOS` 默认不构建或链接 `RxSwift` 适配器、`HiIOSGHTrending` 或厂商闭源 SDK；SwiftPM 仍可能解析 manifest 中其他可选 product 声明的外部依赖。消费项目源码须显式导入实际使用的具体模块，不使用 `@_exported import` 隐式重导出。
 
-## Installation
+### 单向依赖图
 
-For development with SwiftPM, add this repository using the `dev` branch and select only the products your app needs. For CocoaPods development, use the independent podspecs from one local checkout. Because 4.x is not yet indexed by CocoaPods, a local Podfile must declare each HiIOS pod in the selected dependency chain with `:path`. After publication, `pod 'HiIOS'` will install the default bundle. A future public release will use a single matching tag and pod version; this development branch is not a published 4.x release.
+- `HiIOSBase` 无内部模块依赖；
+- `HiIOSCore` 依赖 `HiIOSBase`；
+- `HiIOSNetCore`、`HiIOSNavCore` 与 `HiIOSSuiteCore` 依赖 `HiIOSCore`（各 `Net`/`Nav` 响应式适配器分别依赖对应的 `NetCore`/`NavCore`）；
+- `HiIOSStoreCore` 依赖 `HiIOSBase`（各存储适配器依赖 `HiIOSStoreCore`，其中 `HiIOSStoreKeychain` 同时依赖 `HiIOSBase`）；
+- 日志适配器 `HiIOSSuiteLogOSLog` 与 `HiIOSSuiteLogSwiftyBeaver` 依赖 `HiIOSBase`；
+- `HiIOSGHTrending` 依赖 `HiIOSNetCore`。
 
-Projects using a sibling checkout through SwiftPM `.package(path:)` must also commit a full-SHA version lock and enforce the Verification, CI and Archive/Release checks in [`docs/engineering/sibling-source-dependency.md`](docs/engineering/sibling-source-dependency.md). A local package path alone does not pin the Git commit.
+直接第三方依赖均在 [`Package.swift`](Package.swift) 中锁定精确稳定版本，并与 [`Package.resolved`](Package.resolved) 保持同步。
 
-```ruby
-# Podfile, standalone Base from a local HiIOS checkout
-pod 'HiIOSBase', :path => '/path/to/HiIOS'
+## 接入方式
+
+HiIOS 效率库版本号与 Git 标签统一采用无 `v` 前缀的裸 `x.y.z` 格式，消费项目按所处交付阶段接入：
+
+- **开发期（同级源码依赖）**：将本仓库作为独立 Git 仓库检出在消费项目同级目录，在本地 Swift Package 中通过 `.package(path: ...)` 接入所需公开 product，同时在消费仓库提交包含 **40 位完整 commit SHA** 的版本锁文件并启用自动化阻断门禁；详细约束见 [`docs/engineering/sibling-source-dependency.md`](docs/engineering/sibling-source-dependency.md)。
+- **发布期（已发布固定版本依赖）**：消费项目进入对外发布、TestFlight 外测或 App Store 提审上架阶段后，须移除本地路径覆写，改在 SwiftPM 依赖声明中锁定正式发布的精确裸 `x.y.z` Git 标签（首次正式对外发布基线为 `1.0.0`）。
+
+```swift
+// 开发期：同级源码接入（须配套提交 40 位完整 SHA 版本锁并接入自动化门禁）
+.package(path: "../HiIOS")
+
+// 发布期：锁定精确裸 x.y.z 标签
+.package(url: "https://github.com/jashanyng/HiIOS.git", exact: "1.0.0")
 ```
 
-The module graph is one way: Base has no internal dependency; Core uses Base; Net and Nav use Core; Store uses Base; SuiteCore uses Core, while logging adapters use Base. GitHub Trending uses NetCore. Direct third-party dependencies are pinned to exact versions in `Package.swift` and matching podspecs.
+## 日志默认脱敏策略
 
-## Migrating from 3.x
+日志经由 `LogClient(sink: OSLogSink(subsystem:category:))` 或 `LogClient(routes:)` 搭配按输出端配置的 `LogRoute(sink:policy:)` 发出；每条路由在输出端收到 `LogOutputRecord` 前各自独立过滤与脱敏。默认策略执行脱敏（`LogRedactionPolicy.release` / `.diagnostic`）；`.unredacted` 会原样透传记录，仅适用于消费项目明确加以保护（如端侧加密或受控本地开发诊断）的输出端。`SwiftyBeaverLogSink(destinations:)` 将结构化 `LogOutputRecord` 作为各 destination 的 `context` 转发。消费项目各自维护认证策略、面向用户的文案与业务模型。
 
-| Previous import | New import |
-| --- | --- |
-| `HiIOSDevice` | `HiIOSStoreKeychain` or `HiIOSCore`, according to the API |
-| `HiIOSLog` | `HiIOSBase` plus an optional `HiIOSSuiteLogOSLog` or `HiIOSSuiteLogSwiftyBeaver` sink |
-| `HiIOSNavigation` | `HiIOSNavCore` |
-| `HiIOSNetwork`, `HiIOSNetworkAlamofire` | `HiIOSNetCore` |
-| `HiIOSPersistence` | `HiIOSStoreCore` and a selected adapter |
-| `HiIOSGitHubTrending` | `HiIOSGHTrending` |
+## 平台基线与本地验证
 
-Logging uses `LogClient(sink: OSLogSink(subsystem:category:))` or `LogClient(routes:)` with one `LogRoute(sink:policy:)` per output; each route filters and redacts independently before its sink sees a `LogOutputRecord`. Redaction is the default; `.unredacted` passes records through and is only for outputs the consuming app explicitly protects. `SwiftyBeaverLogSink(destinations:)` forwards the structured `LogOutputRecord` as each destination's `context`. Applications keep their own authentication policy, user-facing copy and business models.
+- **最低平台与语言模式**：`iOS 17+`、`Swift 6`（`swiftLanguageModes: [.v6]`）。
+- **常用本地验证命令**：
 
-## Requirements
+```bash
+# 校验 SwiftPM manifest 定义
+swift package dump-package >/dev/null
 
-iOS 17+, Swift 6. Tests, simulator builds and local CocoaPods checks are required before a public release. This branch does not include a release tag or CocoaPods Trunk publication.
+# 构建并运行无 UI 依赖的纯跨平台宿主测试目标（示例：HiIOSBaseTests）
+swift build --only-use-versions-from-resolved-file --target HiIOSBaseTests
+DYLD_FRAMEWORK_PATH="$(xcrun --show-sdk-platform-path)/Developer/Library/Frameworks" \
+DYLD_LIBRARY_PATH="$(xcrun --show-sdk-platform-path)/Developer/usr/lib" \
+"$(xcrun --find swift | sed 's|/bin/swift$|/libexec/swift/pm/swiftpm-testing-helper|')" \
+  --test-bundle-path .build/debug/HiIOSBaseTests.xctest/Contents/MacOS/HiIOSBaseTests \
+  --testing-library swift-testing
+
+# 运行 iOS Simulator 全包测试
+xcodebuild test -scheme HiIOS-Package -destination 'platform=iOS Simulator,id=<SIMULATOR_UUID>' \
+  -parallel-testing-enabled NO -onlyUsePackageVersionsFromResolvedFile
+
+# 对改动路径执行严格 SwiftLint 检查
+swiftlint lint --strict Package.swift <修改的 Swift 文件路径>
+```
+
+## 文档入口
+
+- 文档总索引：[`docs/README.md`](docs/README.md)
+- 智能体协作与硬边界规范：[`AGENTS.md`](AGENTS.md)
