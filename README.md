@@ -50,9 +50,22 @@ HiIOS 效率库版本号与 Git 标签统一采用无 `v` 前缀的裸 `x.y.z` �
 ## 平台基线与本地验证
 
 - **最低平台与语言模式**：`iOS 17+`、`Swift 6`（`swiftLanguageModes: [.v6]`）。
-- **常用本地验证命令**：
+- **本地统一基础验证入口**：[`scripts/check.sh`](scripts/check.sh)（同时用于 GitHub Actions 质量 CI）。
 
 ```bash
+# 本地统一基础验证（文档校验 + Python 单测 + SwiftPM manifest/SwiftLint + HiIOSBaseTests 宿主测试）
+./scripts/check.sh
+
+# 仅执行版本治理文档校验与 Python 单元测试（无需 macOS / Swift 工具链）
+./scripts/check.sh --docs-only
+```
+
+- **常用分步与模拟器验证命令**：
+
+```bash
+# 校验版本号、变更日志与兼容性文档同步
+python3 scripts/verify_version_docs.py
+
 # 校验 SwiftPM manifest 定义
 swift package dump-package >/dev/null
 
@@ -75,4 +88,7 @@ swiftlint lint --strict Package.swift <修改的 Swift 文件路径>
 ## 文档入口
 
 - 文档总索引：[`docs/README.md`](docs/README.md)
+- 兼容性矩阵、演进契约与迁移指南：[`docs/compatibility.md`](docs/compatibility.md)
+- 变更日志：[`CHANGELOG.md`](CHANGELOG.md)
+- 当前版本号：[`VERSION`](VERSION)
 - 智能体协作与硬边界规范：[`AGENTS.md`](AGENTS.md)

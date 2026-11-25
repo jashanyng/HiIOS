@@ -1,6 +1,8 @@
 # HiIOS 文档索引
 
 - [`architecture/products.md`](architecture/products.md)：产品家族、模块依赖与纯 SwiftPM 单分发边界。
+- [`compatibility.md`](compatibility.md)：环境与依赖兼容矩阵、三阶段演进与裸 `x.y.z` 版本契约及升级迁移指南。
+- [`../CHANGELOG.md`](../CHANGELOG.md)：全仓变更日志与版本更新说明（Release Notes）唯一事实源。
 - [`adr/0001-swiftpm-only-distribution.md`](adr/0001-swiftpm-only-distribution.md)：HiIOS 效率库采用纯 SwiftPM 单分发的架构决策记录。
 - [`engineering/sibling-source-dependency.md`](engineering/sibling-source-dependency.md)：任何消费项目采用同级源码检出时的版本锁与 Git 硬门禁。
 - [`engineering/gh-trending.md`](engineering/gh-trending.md)：独立可选 GitHub Trending 产品的解析、网络、测试与合规限制。
