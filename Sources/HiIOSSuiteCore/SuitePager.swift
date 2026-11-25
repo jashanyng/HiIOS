@@ -17,6 +17,7 @@ public struct SuitePager<Tag: Hashable, Page: View>: View {
     private let swipeThreshold: CGFloat
     private let page: (Tag) -> Page
     @State private var position: Tag?
+    @State private var hasAlignedInitialSelection = false
 
     public init(
         tags: [Tag],
@@ -28,34 +29,60 @@ public struct SuitePager<Tag: Hashable, Page: View>: View {
         self._selection = selection
         self.swipeThreshold = swipeThreshold
         self.page = page
-        self._position = State(initialValue: selection.wrappedValue)
     }
 
     public var body: some View {
         // 按安全区内的尺寸给每页定宽高：页内列表据此留出导航栏与底部栏，不会被遮挡。
         GeometryReader { proxy in
-            ScrollView(.horizontal) {
-                HStack(spacing: 0) {
-                    ForEach(tags, id: \.self) { tag in
-                        page(tag)
-                            .frame(width: proxy.size.width, height: proxy.size.height)
-                            // 与 TabView 分页一致：只有当前页进入无障碍树，其他页的同名元素不会重复出现。
-                            .accessibilityHidden(tag != selection)
-                            .id(tag)
-                    }
+            if proxy.size.width > 0, proxy.size.height > 0 {
+                pagerContent(size: proxy.size)
+            }
+        }
+    }
+
+    private func pagerContent(size: CGSize) -> some View {
+        ScrollView(.horizontal) {
+            HStack(spacing: 0) {
+                ForEach(tags, id: \.self) { tag in
+                    page(tag)
+                        .frame(width: size.width, height: size.height)
+                        // 与 TabView 分页一致：只有当前页进入无障碍树，其他页的同名元素不会重复出现。
+                        .accessibilityHidden(tag != selection)
+                        .id(tag)
                 }
-                .scrollTargetLayout()
             }
-            .scrollIndicators(.hidden)
-            .scrollTargetBehavior(SuitePagingScrollTargetBehavior(swipeThreshold: swipeThreshold))
-            .scrollPosition(id: $position)
-            .onChange(of: position) { _, newValue in
-                if let newValue, newValue != selection { selection = newValue }
+            .scrollTargetLayout()
+        }
+        .scrollIndicators(.hidden)
+        .scrollTargetBehavior(SuitePagingScrollTargetBehavior(swipeThreshold: swipeThreshold))
+        .scrollPosition(id: $position)
+        .task(id: size.width) {
+            if !hasAlignedInitialSelection {
+                // 等 ScrollView 首帧布局与 contentSize 就绪后，再无动画对齐初始选中页，
+                // 并阻止此前可能上报的第 0 页 position 反向覆盖外部 selection。
+                await Task.yield()
+                guard !Task.isCancelled else { return }
+                alignWithoutAnimation(to: selection)
+                hasAlignedInitialSelection = true
+            } else {
+                alignWithoutAnimation(to: selection)
             }
-            .onChange(of: selection) { _, newValue in
-                guard position != newValue else { return }
-                withAnimation(.easeInOut(duration: 0.25)) { position = newValue }
-            }
+        }
+        .onChange(of: position) { _, newValue in
+            guard hasAlignedInitialSelection else { return }
+            if let newValue, newValue != selection { selection = newValue }
+        }
+        .onChange(of: selection) { _, newValue in
+            guard hasAlignedInitialSelection, position != newValue else { return }
+            withAnimation(.easeInOut(duration: 0.25)) { position = newValue }
+        }
+    }
+
+    private func alignWithoutAnimation(to tag: Tag) {
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            position = tag
         }
     }
 }
